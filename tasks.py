@@ -3,12 +3,12 @@ import nm_math
 
 
 class Labs:
-    _n_g = 10.
-    _n_c = 4.
+    _n_g = 10
+    _n_c = 6
 
-    _matrix_a_lab1 = np.array([[_n_c, 5, 2],
-                               [5, _n_c, -_n_g],
-                               [2, -_n_g, _n_c]], dtype=float)
+    matrix_a_lab1 = np.array([[_n_c, 5, 2],
+                              [5, _n_c, -_n_g],
+                              [2, -_n_g, _n_c]], dtype=float)
 
     _matrix_b_lab1 = np.array([[1],
                                [_n_c],
@@ -19,23 +19,24 @@ class Labs:
     _c_coef = []
     _d_coef = []
 
-    matrix_b_lab3 = np.array([[_n_c + 10, _n_g, 1],
+    _matrix_b_lab3 = np.array([[_n_c + 10, _n_g, 1],
                                [_n_g, _n_c + 10, 3],
                                [1, 3, _n_g + 4]], dtype=float)
 
-    matrix_c_lab3 = np.array([[_n_g],
+    _matrix_c_lab3 = np.array([[_n_g],
                                [_n_c + 10],
                                [0]], dtype=float)
 
     _discrete_function_dop1 = {-0.2: -0.20136, 0: 0, 0.2: 0.20136, 0.4: 0.41152, 0.6: 0.64350}
 
+
     def run_lab1(self):
         print("\nЗадача 1. Метод Гаусса\n")
-        print("Матрица А:\n" + str(self._matrix_a_lab1))
+        print("Матрица А:\n" + str(self.matrix_a_lab1))
         print("Матрица B:\n" + str(self._matrix_b_lab1))
-        print("Определитель A = " + str(nm_math.det_gauss(self._matrix_a_lab1)))
-        print("A^-1:\n" + str(nm_math.inverse_matrix(self._matrix_a_lab1)))
-        print("Решение СЛАУ AX = B\nX = " + str(nm_math.solve_gauss(self._matrix_a_lab1, self._matrix_b_lab1)))
+        print("Определитель A = " + str(nm_math.det_gauss(self.matrix_a_lab1)))
+        print("A^-1:\n" + str(nm_math.inverse_matrix(self.matrix_a_lab1)))
+        print("Решение СЛАУ AX = B\nX = " + str(nm_math.solve_gauss(self.matrix_a_lab1, self._matrix_b_lab1)))
 
     def _generate_matrix_2lab(self):
         i = 1
@@ -59,12 +60,22 @@ class Labs:
 
     def run_lab3(self):
         print("\nЗадача 3\n")
-        print("Матрица А:\n" + str(self.matrix_b_lab3))
-        print("Матрица В:\n" + str(self.matrix_c_lab3))
+        print("Матрица А:\n" + str(self._matrix_b_lab3))
+        print("Матрица В:\n" + str(self._matrix_c_lab3))
         print("Решение СЛАУ AX=B методом простых итераций")
-        print(nm_math.simple_iteration_method(self.matrix_b_lab3, self.matrix_c_lab3))
+        print(nm_math.simple_iteration_method(self._matrix_b_lab3, self._matrix_c_lab3))
         print("Решение СЛАУ AX=B методом Зейделя")
-        print(nm_math.zeidel_method(self.matrix_b_lab3, self.matrix_c_lab3))
+        print(nm_math.zeidel_method(self._matrix_b_lab3, self._matrix_c_lab3))
+
+    def run_lab4(self):
+        print("\nЗадача 4\n")
+        print("Исходная матрица:\n" + str(self._matrix_b_lab3))
+        _lambda, vectors = nm_math.jacobi_eigenvalue_algorithm(self._matrix_b_lab3)
+        print("Собственные числа:")
+        for i, l in enumerate(_lambda):
+            print(f"lambda_{i} = " + str(l))
+        v_1, v_2, v_3 = np.split(vectors, [1, 2], axis=1)
+        print("Собственные векторы:\nv_1 =\n" + str(v_1) + "\nv_2 = \n" + str(v_2) + "\nv_3 = \n" + str(v_3))
 
     def run_numeric_diff(self):
         print("\nЧисленное дифференцирование\n")

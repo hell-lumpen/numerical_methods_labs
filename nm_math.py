@@ -1,3 +1,6 @@
+import math
+import sys
+
 import numpy as np
 
 
@@ -97,7 +100,7 @@ def tridiagonal_matrix_algorithm(a_coefficients: list[float],
     for i in range(n - 2, -1, -1):
         x_coefficients[i] = q[i] + p[i] * x_coefficients[i + 1]
 
-    return x_coefficients
+    return np.expand_dims(x_coefficients, -1)
 
 
 def dot(matrix_a: np.array, matrix_b: np.array) -> np.array:
@@ -190,6 +193,57 @@ def zeidel_method(matrix_a: np.array, matrix_b: np.array) -> np.array:
     print(f"Количество итераций: {iteration}\n")
     return x_matrix_prev
 
+def _get_abs_max_supradiagonal_element(matrix: np.array) -> tuple[float, int, int]:
+    max_element = float('-inf')
+    k = 0
+    m = 0
+    for i in range(len(matrix)):
+        for j in range(len(matrix[0])):
+            if i < j:
+                if abs(matrix[i][j]) > max_element:
+                    max_element = matrix[i][j]
+                    k = i
+                    m = j
+
+    return max_element, k, m
+
+def _get_rotation_matrix(rotation_angle: float, k: int, m: int, size: int) -> np.array:
+    rotation_matrix = np.eye(size, dtype=float)
+    rotation_matrix[k][k] = math.cos(rotation_angle)
+    rotation_matrix[k][m] = - math.sin(rotation_angle)
+    rotation_matrix[m][k] = math.sin(rotation_angle)
+    rotation_matrix[m][m] = math.cos(rotation_angle)
+    return rotation_matrix
+
+def jacobi_eigenvalue_algorithm(matrix: np.array) -> tuple[np.array, np.array]:
+    """Возвращает столбец собственных чисел и матрицу, состояющую из столбцов - собственных векторов"""
+    epsilon = 1.e-7
+    i = 0
+
+    A = np.copy(matrix)
+    a, k, m = _get_abs_max_supradiagonal_element(A)
+    converge = abs(a) > epsilon
+
+    V = np.eye(len(matrix), dtype=float)
+    while converge:
+        if abs(A[k][k] - A[m][m]) < epsilon:
+            if A[k][m] > 0:
+                rotation_angle = math.pi / 4
+            else:
+                rotation_angle = -math.pi / 4
+        else:
+            rotation_angle = 1/2 * math.atan(2*a / (A[k][k] - A[m][m]))
+
+        H = _get_rotation_matrix(rotation_angle, k, m, len(matrix))
+
+        V = dot(V, H)
+        A = dot(dot(H.T, A), H)
+
+        a, k, m = _get_abs_max_supradiagonal_element(A)
+        i += 1
+        converge = abs(a) > epsilon
+
+    return A.diagonal(offset=0), V
 
 
 def numerical_first_diff(discrete_function: dict, x: float, h: float):
